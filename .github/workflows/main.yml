@@ -1,0 +1,31 @@
+name: Deploy to Firebase Hosting
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Instalar dependencias
+        run: npm ci --legacy-peer-deps
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy a Firebase
+        run: |
+          echo '${{ secrets.GOOGLE_CREDENTIALS }}' > /tmp/sa.json
+          npx firebase-tools deploy --only hosting --project finnova-asopro
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: /tmp/sa.json
